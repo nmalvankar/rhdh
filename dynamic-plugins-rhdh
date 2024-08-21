@@ -1,0 +1,154 @@
+kind: ConfigMap
+apiVersion: v1
+metadata:
+  name: dynamic-plugins-rhdh
+  namespace: rhdh-operator
+  uid: c1c34dda-fc01-4d6f-8e2f-438533ce3f1b
+  resourceVersion: '15063690'
+  creationTimestamp: '2024-08-08T16:39:25Z'
+  labels:
+    app.kubernetes.io/managed-by: Helm
+    rhdh.redhat.com/ext-config-sync: 'true'
+  annotations:
+    meta.helm.sh/release-name: orchestrator
+    meta.helm.sh/release-namespace: sonataflow-infra
+    rhdh.redhat.com/backstage-name: backstage
+  managedFields:
+    - manager: manager
+      operation: Update
+      apiVersion: v1
+      time: '2024-08-08T16:40:11Z'
+      fieldsType: FieldsV1
+      fieldsV1:
+        'f:metadata':
+          'f:annotations':
+            'f:rhdh.redhat.com/backstage-name': {}
+          'f:labels':
+            'f:rhdh.redhat.com/ext-config-sync': {}
+    - manager: helm
+      operation: Update
+      apiVersion: v1
+      time: '2024-08-19T22:59:19Z'
+      fieldsType: FieldsV1
+      fieldsV1:
+        'f:data': {}
+        'f:metadata':
+          'f:annotations':
+            .: {}
+            'f:meta.helm.sh/release-name': {}
+            'f:meta.helm.sh/release-namespace': {}
+          'f:labels':
+            .: {}
+            'f:app.kubernetes.io/managed-by': {}
+    - manager: Mozilla
+      operation: Update
+      apiVersion: v1
+      time: '2024-08-20T03:25:56Z'
+      fieldsType: FieldsV1
+      fieldsV1:
+        'f:data':
+          'f:dynamic-plugins.yaml': {}
+data:
+  dynamic-plugins.yaml: |
+    includes:
+      - dynamic-plugins.default.yaml
+    plugins:
+      - package: ./dynamic-plugins/dist/backstage-plugin-kubernetes-backend-dynamic
+        disabled: false
+        pluginConfig:
+          kubernetes:
+            customResources:
+              - group: 'tekton.dev'
+                apiVersion: 'v1'
+                plural: 'pipelines'
+              - group: 'tekton.dev'
+                apiVersion: 'v1'
+                plural: 'pipelineruns'
+              - group: 'tekton.dev'
+                apiVersion: 'v1'
+                plural: 'taskruns'
+              - group: 'route.openshift.io'
+                apiVersion: 'v1'
+                plural: 'routes'
+            serviceLocatorMethod:
+              type: 'multiTenant'
+            clusterLocatorMethods:
+              - type: 'config'
+                clusters:
+                  - name: 'Default Cluster'
+                    url: ${K8S_CLUSTER_URL}
+                    authProvider: 'serviceAccount'
+                    skipTLSVerify: false
+                    serviceAccountToken: ${K8S_CLUSTER_TOKEN}
+      - package: ./dynamic-plugins/dist/backstage-plugin-kubernetes
+        disabled: false
+      - package: ./dynamic-plugins/dist/janus-idp-backstage-plugin-tekton
+        disabled: false
+      - disabled: false
+        package: ./dynamic-plugins/dist/janus-idp-backstage-plugin-topology   
+      - disabled: false
+        package: ./dynamic-plugins/dist/janus-idp-backstage-plugin-argocd
+      - disabled: false
+        package: ./dynamic-plugins/dist/roadiehq-backstage-plugin-argo-cd-backend-dynamic
+      - disabled: false
+        package: ./dynamic-plugins/dist/roadiehq-scaffolder-backend-argocd-dynamic
+      - disabled: false
+        package: ./dynamic-plugins/dist/janus-idp-backstage-plugin-quay 
+      - disabled: false
+        package: ./dynamic-plugins/dist/roadiehq-backstage-plugin-github-pull-requests
+      - disabled: false
+        package: ./dynamic-plugins/dist/backstage-plugin-github-actions
+      - disabled: false
+        package: "@janus-idp/backstage-plugin-orchestrator@1.17.0"
+        integrity: sha512-f/XBL1prZWrnv3ckZNzaiRVOlGpc0jHn7RAHHndhuKRh0Hlzfsmxvs31+hBljE4aLXi6wBwm8iOn604JfiMsTA==
+        pluginConfig:
+          orchestrator:
+            dataIndexService:
+              url: http://sonataflow-platform-data-index-service.sonataflow-infra
+      - disabled: false
+        package: "@janus-idp/backstage-plugin-orchestrator-backend-dynamic@1.16.0"
+        integrity: sha512-pQzJpl+BzM1vXmogPo+IJvFLTcWeKjStpQrypHgPglfQgMWkywyU/WWyWXjkEZfFTB+S7jARzemc4rkJx/2zjQ==
+        pluginConfig:
+          dynamicPlugins:
+            frontend:
+              janus-idp.backstage-plugin-orchestrator:
+                appIcons:
+                  - importName: OrchestratorIcon
+                    module: OrchestratorPlugin
+                    name: orchestratorIcon
+                dynamicRoutes:
+                  - importName: OrchestratorPage
+                    menuItem:
+                      icon: orchestratorIcon
+                      text: Orchestrator
+                    module: OrchestratorPlugin
+                    path: /orchestrator
+      - disabled: false
+        package: "https://github.com/mareklibra/gh-pages/raw/main/download/004/plugin-notifications-dynamic-0.2.0-rc.0-0.tgz"
+        integrity: sha512-wmISWN02G4OiBF7y8Jpl5KCbDfhzl70s+r0h2tdVh1IIwYmojH5pqXFQAhDd3FTlqYc8yqDG8gEAQ8v66qbU1g==
+        pluginConfig:
+          dynamicPlugins:
+            frontend:
+              redhat.plugin-notifications:
+                dynamicRoutes:
+                  - importName: NotificationsPage
+                    menuItem:
+                      config:
+                        props:
+                          titleCounterEnabled: true
+                          webNotificationsEnabled: false
+                      importName: NotificationsSidebarItem
+                    path: /notifications
+      - disabled: false
+        package: "https://github.com/mareklibra/gh-pages/raw/main/download/004/plugin-signals-dynamic-0.0.5-rc.0-0.tgz"
+        integrity: sha512-5Iwp9gF6VPiMLJ5NUw5s5Z17AuJ5XYS97wghNTfcmah/OFxTmgZHWxvhcRoXDRQvyj4nc/gOZes74kp6kZ9XDg==
+        pluginConfig:
+          dynamicPlugins:
+            frontend:
+              redhat.plugin-signals: {}
+      - disabled: false
+        package: "https://github.com/mareklibra/gh-pages/raw/main/download/004/plugin-notifications-backend-dynamic-0.2.0-rc.0-0.tgz"
+        integrity: sha512-CHTNYVGWPxT94viabzCqxKIkDxflium9vkgh9Emu+3SuJSEsrZ6G+U1UZgpQ4gO03oOeiTm3xsoTg/AfKGf7CQ==
+      - disabled: false
+        package: "https://github.com/mareklibra/gh-pages/raw/main/download/004/plugin-signals-backend-dynamic-0.1.3-rc.0-0.tgz"
+        integrity: sha512-LlkM2Mf2QTndsS6eBzyXDhJmRTHLpAku3hhlvWhtQChSLTFCtNGRTIQA5WHG7NqLH0QqBz+UcEjX7Vca82QKKg==
