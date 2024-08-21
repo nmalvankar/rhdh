@@ -1,0 +1,21 @@
+apiVersion: rhdh.redhat.com/v1alpha1
+kind: Backstage
+metadata:
+  name: backstage
+  namespace: rhdh-operator
+spec:
+  application:
+    appConfig:
+      configMaps:
+        - name: app-config-rhdh
+        - name: app-config-rhdh-auth
+        - name: app-config-rhdh-catalog
+      mountPath: /opt/app-root/src
+    dynamicPluginsConfigMapName: dynamic-plugins-rhdh
+    extraEnvs:
+      envs:
+        - name: NODE_TLS_REJECT_UNAUTHORIZED
+          value: '0'
+      secrets:
+        - name: backstage-backend-auth-secret
+    replicas: 1
